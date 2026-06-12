@@ -1,0 +1,31 @@
+[
+  {
+    "id": "case-001",
+    "question": "Qual o SLA para cliente Gold em chamados gerais?",
+    "context_chunks": [
+      "Chunk SLA-2024-B: Gold resposta ate 2h uteis e resolucao ate 24h uteis.",
+      "Chunk SLA-2024-A: Tiers validos sao Gold, Silver e Standard."
+    ],
+    "expect_no_answer": false,
+    "forbidden_terms": ["platinum", "nao documentado"]
+  },
+  {
+    "id": "case-002",
+    "question": "Qual o SLA para cliente Platinum?",
+    "context_chunks": [
+      "Chunk SLA-2024-A: Nao existem outros tiers alem de Gold, Silver e Standard.",
+      "Chunk FAQ-15: Nao existe tier Platinum na NovaTech."
+    ],
+    "expect_no_answer": false,
+    "forbidden_terms": ["2h para platinum", "4h para platinum", "8h para platinum"]
+  },
+  {
+    "id": "case-003",
+    "question": "Frete para 300kg para Salvador?",
+    "context_chunks": [
+      "Chunk PROC-042v2-B: Multiplicadores para cargas acima de 500kg."
+    ],
+    "expect_no_answer": true,
+    "forbidden_terms": ["o multiplicador e", "valor final e"]
+  }
+]

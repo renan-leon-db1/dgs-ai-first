@@ -1,0 +1,347 @@
+Prompt engineering como código para assistente de logística
+
+Created: 6/11/2026 22:46:51
+Updated: 6/11/2026 23:01:22
+Exported: 6/11/2026 23:04:05
+Link: https://claude.ai/chat/05cf42d9-ca3d-4422-ac3c-198e2c5c49e4
+
+User:
+
+6/11/2026 22:46:52
+
+Atue como Arquiteto de IA para um assistente de atendimento de logistica (NovaTech).
+Quero definir prompt engineering como codigo: estrutura de repositorio, convencao de nomes,
+politica de alteracao, estrategia de testes e criterio de aprovacao.
+
+Requisitos obrigatorios:
+- Sempre citar fonte na resposta final do assistente.
+- Nunca inventar prazos/valores.
+- Quando nao encontrar resposta, declarar explicitamente.
+- Responder em portugues formal.
+
+Me entregue em formato de politica tecnica objetiva para uso em PR/CI.
+
+Assistant:
+
+6/11/2026 22:48:09
+
+Viewed file, created file, presented file
+
+Check frontend design skill
+
+Technical policy document for NovaTech AI prompt engineering
+
+Presenting file(s)...
+
+Done
+
+A política está pronta. Abaixo um resumo das decisões arquiteturais principais:
+
+Estrutura do repositório separa claramente quatro camadas — system, modules, personas e guardrails — o que permite revisar e versionar cada responsabilidade de forma independente, sem risco de regressão cruzada.
+
+Convenção de nomes usa kebab-case e metadados YAML obrigatórios em cabeçalho, tornando rastreabilidade e triagem de PR automatizáveis.
+
+Política de alteração classifica mudanças em patch/minor/major com quórum de aprovação crescente. Isso evita o padrão comum de "editei só uma palavrinha" que silenciosamente destrói um guardrail.
+
+Estratégia de testes adota pirâmide clássica adaptada para prompts: unitários por módulo isolado, integração por composição, e regressão para casos que já falharam em produção. Casos de teste são YAML versionados junto ao código — não planilhas externas.
+
+Critérios de aprovação combinam gates automáticos de CI (100% de testes, 0 regressões, guardrails invariantes nunca violados) com LLM-Judge para asserções semânticas que regex não alcança.
+
+Os três comportamentos obrigatórios que você definiu — citação de fonte, proibição de invenção de dados, declaração explícita de desconhecimento — estão codificados tanto como arquivos de guardrail auditáveis quanto como gates de CI que bloqueiam merge se violados em qualquer caso de teste.
+
+File: /mnt/user-data/outputs/novatech-prompt-engineering-policy.md
+
+User:
+
+6/11/2026 22:48:51
+
+Com base no mesmo cenario, detalhe a anatomia completa de contexto por query:
+- system prompt (estatico)
+- metadados de cliente (dinamico)
+- chunks recuperados (dinamico)
+- pergunta (dinamico)
+- historico de conversa (dinamico e crescente)
+
+Forneca estimativa de tokens por bloco, limite total operacional por query,
+e estrategia de poda quando exceder o limite.
+Inclua risco de lost in the middle e context rot.
+
+Assistant:
+
+6/11/2026 22:52:30
+
+Arquitetou visualização interativa e política de gestão contextual com estimativas tokenizadas.
+
+The user wants a detailed breakdown of the context anatomy for the NovaTech logistics assistant, with token estimates per block, total operational limits, pruning strategies, and risks like "lost in the middle" and "context rot". This should be delivered as a technical policy document.
+
+Let me create a comprehensive markdown document covering all these aspects.
+
+Check frontend design skill for visualization
+
+Now I'll create a comprehensive interactive HTML artifact that visualizes the context anatomy for the NovaTech logistics assistant. This should include:
+
+Token estimates per block
+
+Total operational limits
+
+Pruning strategies
+
+Lost in the middle risk
+
+Context rot risk
+
+I'll create an interactive widget that shows the context anatomy visually, plus generate a markdown policy document.
+
+Let me plan the visual:
+
+A stacked bar/anatomy diagram showing each context block with token counts
+
+An interactive pruning simulator
+
+Risk indicators for "lost in the middle" and "context rot"
+
+I'll also draft the markdown policy document alongside the visual
+
+For the interactive widget, I'm mapping out token budgets across the context window—system prompt around 800-1,500 tokens, client metadata roughly 200-400 tokens, and retrieved chunks taking up 1,500-3,000 tokens, all within an operational limit of 12,000-16,000 tokens per query to keep costs and latency reasonable for the logistics assistant.
+
+The visualization will let users interact with a conversation turn slider to see how the token allocation shifts and how conversation history gets pruned over time, while highlighting risk zones like lost-in-the-middle effects and context degradation.
+
+Now I'm mapping out the token budget across the five blocks with realistic ranges—system prompt staying relatively stable around 600-1,200 tokens, client metadata and retrieved chunks taking up the bulk of the middle tier, and conversation history growing dynamically until it hits the pruning threshold.
+
+I'm also flagging two key risks: the "lost in the middle" problem where context in the center gets less attention, and context rot where older conversation turns become stale as the exchange lengthens. Time to build out the artifact.
+
+Markdown policy document for context anatomy
+
+Done
+
+Agora o widget interativo:
+
+[Interactive Widget: novatech_context_anatomy]
+
+Presented file
+
+Presenting file(s)...
+
+Done
+
+A política e o widget cobrem os três planos do problema. Aqui o resumo das decisões arquiteturais:
+
+Anatomia e ordenação dos blocos. System prompt e metadados de cliente precedem os chunks porque são âncoras de identidade e autoridade — o modelo deve interpretá-los como contexto de quem é e com quem fala antes de ver dados recuperados. A pergunta corrente vai por último para se beneficiar do viés de recência dos transformers.
+
+Orçamento de 12.000 tokens (não o máximo do modelo). Usar a janela inteira seria um erro de projeto: latência, custo e os dois fenômenos de degradação pioram com contexto desnecessariamente grande. O limite operacional é uma decisão de produto, não uma limitação técnica.
+
+Lost in the middle. O risco é real acima de ~6.000 tokens totais: chunks posicionados no meio de um contexto longo são subponderados. A mitigação primária é mover o chunk de maior score para a posição final do bloco RAG, o mais próximo possível da pergunta. A secundária é o prefixo de atenção forçada no system prompt.
+
+Context rot. Diferente do lost in the middle (problema de posição), o rot é um problema de validade semântica — o histórico acumula status desatualizados, intenções resolvidas e contradições com dados novos. A estratégia de invalidação explícita com o marcador [ATUALIZAÇÃO] é o mecanismo central; a sumarização de turnos resolvidos é o mecanismo de limpeza.
+
+Poda em cascata. O algoritmo de poda tem quatro passos graduados justamente para evitar o erro comum de truncamento abrupto, que elimina turnos por ordem de chegada sem considerar relevância. O princípio de proteção por referência a pedido preserva continuidade do caso mesmo durante poda agressiva.
+
+File: /mnt/user-data/outputs/novatech-context-anatomy-policy.md
+
+User:
+
+6/11/2026 22:53:48
+
+File:
+
+Revise criticamente a estrategia abaixo e aponte fragilidades praticas.
+Seja rigoroso em riscos de alucinacao, contradicao documental e governanca de prompt.
+Proponha ajustes objetivos.
+
+Assistant:
+
+6/11/2026 22:58:28
+
+Identificou fragilidades críticas em governança, contexto e proteção contra alucinação.
+
+The user wants a critical review of the strategy document they've shared, focusing on practical weaknesses around hallucination risks, document contradiction handling, and prompt governance. They want rigorous analysis and concrete proposed fixes.
+
+Let me read through the document carefully and identify real weaknesses:
+
+Section 1 - Prompt as Code:
+
+Version naming: novatech_assistente_atendimento.v1.md - the convention says dominio_objetivo.tipoPrompt.vN.ext but the example doesn't match (no tipoPrompt between objective and version)
+
+No mention of how old versions are deprecated/retired - does v1 stay forever? Risk of confusion
+
+The daily drift detection is mentioned but lacks concrete metrics—there's no baseline defined or quantitative threshold for what constitutes drift
+
+Evaluation cases live in a single JSON file with no documented structure or coverage requirements
+
+The approval chain lists "1 Tech Lead + 1 Product/QA" but the AI engineer appears in the change permissions yet isn't part of sign-off, creating a gap
+
+No rollback procedure if the daily CI check fails, and model version pinning isn't addressed despite the drift detection implying models can shift underneath the system
+
+The RAG budget shows 8 chunks at 700 tokens each (5,600 total), but the earlier policy capped it at 300-600 tokens per chunk across 3-6 chunks—that's a significant inconsistency
+
+"Reserva técnica" is vague about whether it's for output buffering or handling variability, and the rolling window allocation of 1,500 tokens only covers about 5 turns at 300 tokens each, contradicting the earlier 0-6,500 token range for history
+
+There's also a mismatch between claiming a 128k token model while setting an operational limit around 12k tokens per request, with the justification here focused on avoiding context degradation rather than latency or cost concerns mentioned elsewhere
+
+The document doesn't address "lost in the middle" effects, chunk ordering strategies, or how the system determines which domains are relevant when queries span multiple anticipated domains
+
+Looking at the system prompt itself, Rule 4 hardcodes an exact Portuguese phrase for insufficient information responses, which is brittle since the model might paraphrase it and break the regex validation in the harness. Rule 5 asks the model to detect contradictions and present conflicting versions with dates, but this is cognitively demanding and doesn't specify what happens when vigência metadata is missing or when chunks lack source IDs. The prompt mandates using only retrieved context, yet doesn't guide the model on how to handle questions requiring reasoning beyond the chunks or those outside defined scopes like SLAs and compliance—it'll either hallucinate or refuse unhelpfully. There's also no instruction for the model to signal confidence levels or acknowledge when queries fall outside its knowledge boundaries. The coverage classifier dependency isn't explained, and the tier rejection rule is too narrow—other invented entities could slip through. There's also a compliance gap: the audit logs capture client metadata without any PII handling strategy. The system doesn't specify what happens after rejection, and there's no model versioning strategy despite daily drift detection, plus the evaluation framework only uses binary pass/fail rather than quality scoring.
+
+I'm also noticing some structural inconsistencies—the response template in the policy section doesn't match what the prompt actually requests, and there's no handling for contradictory documents in the RAG pipeline before they reach the model. The system lacks injection attack protections and doesn't define what constitutes a breaking change versus an acceptable behavioral shift.
+
+I'll organize this into a comprehensive markdown review covering hallucination risks, contradiction handling, and governance gaps, with concrete before-and-after examples for each fragility I identify.
+
+Check available skills
+
+Now I have what I need. Let me write a comprehensive critical review of the submitted strategy. I'll identify the main weaknesses and propose concrete fixes.
+
+Key fragilidades I'll cover:
+
+Seção 1 - Governança de Prompt:
+
+Convenção de nomes inconsistente (a definição não bate com o exemplo)
+
+Sem versionamento do modelo base - "drift diário" pressupõe modelo não fixado
+
+prompt_eval_cases.json único sem estrutura de cobertura mínima por domínio
+
+Falta clareza sobre o que fazer quando CI falha — não há política de rollback ou bloqueio definida
+
+AI Engineer aparece como autorizado para alterar mas não integra o quórum de aprovação
+
+Nenhuma ADR documentando decisões arquiteturais maiores
+
+Não há separação explícita entre versões em produção versus em teste
+
+Seção 2 - Anatomia de Contexto:
+
+8 chunks × 700 tokens = 5.600 tokens — orçamento muito agressivo comparado ao histórico de apenas 1.500
+
+A "reserva técnica" de 3.270 tokens é vaga — não fica claro se é buffer de saída ou margem para variância
+
+Histórico de 1.500 tokens é insuficiente para conversas longas — suporta apenas ~5 turnos a 300 tokens por turno
+
+Nenhuma menção a lost in the middle ou context rot
+
+Sem estratégia definida para ordenar chunks — não está claro se prioriza relevância ou recência
+
+"Top-k por domínio" não explica como o sistema classifica o domínio da query
+
+Seção 3 - System Prompt:
+
+Frase de não-encontro hardcoded no prompt pode ser parafraseada pelo modelo, quebrando o regex do harness
+
+Regra sobre fontes contraditórias é cognitivamente complexa demais — falta instrução para quando vigência não está disponível
+
+Sem instrução clara sobre chunks sem source ID, questões fora do escopo ou confiança parcial
+
+Prompt termina sem separador claro entre regras e formato esperado
+
+Seção 4 - Prompt vs Harness:
+
+Regex para fontes é frágil — sensível a case, espaçamento e múltiplas fontes
+
+Blocklist de termos de alucinação é uma estratégia de jogo do rato — o modelo pode expressar certeza indevida sem usar os termos bloqueados
+
+Falta clareza sobre quem marca perguntas como sem cobertura e como o sistema classifica dados inventados além de tiers inexistentes
+
+Auditoria não menciona PII — metadados do cliente são logados integralmente?
+
+Sem definição do que acontece após rejeição (retry, escalação, mensagem de erro) e sem proteção contra prompt injection
+
+Cross-cutting:
+
+Inconsistência entre o budget de chunks da seção 2 versus a política anterior
+
+Template de resposta varia entre seções — seção 1 usa "Resposta, Evidências, Incertezas, Próximos passos" enquanto seção 3 usa "Resposta objetiva, Evidências e fontes, Observações de conflito/limitação"
+
+Sem pinning de versão de modelo
+
+Generating markdown review document...
+
+I'm also creating a risk matrix visualization that plots each finding by severity and effort to fix, giving a clear visual overview of priorities.
+
+Done
+
+Vou fazer a análise item a item, com severidade e proposta concreta para cada fragilidade.
+
+Created file
+
+Critical review of the NovaTech prompt strategy document
+
+Done
+
+[Interactive Widget: novatech_risk_matrix]
+
+Presented file
+
+Presenting file(s)...
+
+Done
+
+Foram identificadas 19 fragilidades em quatro categorias. Abaixo os cinco problemas mais urgentes e por que merecem atenção imediata:
+
+F-15 (blocklist de alucinação) é a fragilidade mais perigosa do documento. Não por ser difícil de corrigir, mas porque cria confiança falsa: a equipe acredita ter um guardrail contra certeza indevida quando na prática ele cobre menos de 20% das formas reais de expressão. A substituição proposta — verificar âncora documental por afirmação, não vocabulário — é semanticamente mais forte e independe de manutenção de lista.
+
+F-10 e F-14 são acoplamentos frágeis que vão quebrar em produção. Uma frase literal hardcoded no prompt e um regex case-sensitive sobre a saída formam um sistema que funciona nos testes iniciais e falha silenciosamente após qualquer atualização de modelo. A solução de marcadores estruturados (<<SEM_COBERTURA>>) desacopla o comportamento semântico do texto de UI.
+
+F-01 (sem pinning de modelo) invalida toda a baseline de evals. Se o modelo pode mudar sem um PR de aprovação, a execução diária de CI mede comportamento de um sistema que não está sob controle de versão — o que torna os evals decorativos.
+
+F-06 (desequilíbrio de orçamento) é o problema de context management mais grave. 5.600 tokens para RAG com apenas 1.500 para histórico significa que uma conversa de atendimento real será truncada no turno 5–6, precisamente quando o contexto acumulado é mais valioso para resolver o caso.
+
+F-08 (classificador de domínio implícito para RAG) é o único item de esforço alto, e requer uma decisão arquitetural antes de qualquer sprint: a estratégia de top-k por domínio só funciona com um componente de classificação de intenção que o documento menciona mas não especifica. Adiar essa decisão bloqueia a implementação de toda a estratégia de recuperação multi-domínio.
+
+File: /mnt/user-data/outputs/novatech-critical-review.md
+
+User:
+
+6/11/2026 22:59:42
+
+Gere um checklist de avaliacao com os criterios:
+1) prompts tratados como codigo,
+2) anatomia de contexto com orcamento,
+3) separacao probabilistico x deterministico,
+4) script de teste funcional.
+
+Formato: checklist simples com "atende / nao atende / evidencia".
+
+Assistant:
+
+6/11/2026 23:01:22
+
+Arquitetou checklist interativo com quatro critérios e subitens estruturados.
+
+The user wants a checklist with 4 evaluation criteria, in a simple format with "atende / não atende / evidência". This should be an interactive widget where the user can mark each item. Let me create a clean, functional checklist.
+
+The checklist should cover:
+
+Prompts tratados como código
+
+Anatomia de contexto com orçamento
+
+Separação probabilístico x determinístico
+
+Script de teste funcional
+
+Each item needs: criterion description, status (atende/não atende/parcial?), and evidence field.
+
+I'll make this as an interactive HTML artifact where the user can:
+
+Toggle each item between "atende", "não atende", and "parcial"
+
+Add evidence text
+
+See a summary score
+
+Now I'm thinking through the sub-items for each main criterion. For "Prompts tratados como código," I need to break it down into specific, measurable aspects like repository structure, naming conventions, change policies, and approval requirements.
+
+For "Anatomia de contexto com orçamento," I'm identifying the five key context blocks and how to budget tokens across them, including strategies for handling context overflow, preventing information loss, and maintaining a single source of truth for token allocation.
+
+For "Separação probabilístico x determinístico," I'm starting to define how to enforce deterministic versus probabilistic behaviors within the prompt itself. Defining the checklist widget with toggle states cycling through unevaluated, meets requirements, doesn't meet, partial, and back to unevaluated, plus evidence fields for each item and a summary panel showing counts. I'll build this with local storage so evaluations persist across sessions.
+
+Done
+
+[Interactive Widget: novatech_eval_checklist]
+
+O checklist contém 30 itens distribuídos pelos quatro critérios. Algumas notas de uso:
+
+Clicar no botão de status de cada item cicla entre —, ✓ atende, ✗ não atende e ~ parcial. O campo de evidência aparece assim que um status é selecionado — use-o para registrar referência a artefato, PR, link de CI ou observação livre. O estado é salvo automaticamente entre sessões.
+
+Os itens foram derivados diretamente das fragilidades identificadas na revisão crítica (F-01 a F-19), de forma que um sistema que atende todos os 30 pontos elimina as vulnerabilidades catalogadas. Os de maior peso operacional para começar são 1.5 (pinning de modelo), 2.4 (buffer de saída explícito), 3.2 (marcadores estruturados) e 3.4 (âncora documental por afirmação) — todos de esforço baixo e impacto crítico.
+
+Powered by Claude Exporter (https://www.ai-chat-exporter.net)
