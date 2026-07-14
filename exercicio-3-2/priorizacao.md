@@ -1,0 +1,14 @@
+# Priorização — Go-live em 2 semanas
+
+> Decisão do Tech Lead, informada pela avaliação própria ([avaliacao-riscos.md](avaliacao-riscos.md)), pela avaliação do Claude como co-reviewer ([avaliacao-riscos-Claude.md](avaliacao-riscos-Claude.md)) e pela comparação entre as duas ([comparacao.md](comparacao.md)).
+
+| Item de risco | Decisão | Justificativa |
+|---|---|---|
+| Contradição interna no AGENTS.md | **Verificar** | Arquivo que orquestra toda a implementação, sendo o core do resultado gerado. É extremamente importante termos um arquivo consistente. A revisão não deve durar mais de 1 dia. |
+| `validator.ts` violando a própria skill do projeto | **Risco residual** | Mesmo não atendendo à skill, não é motivo dos erros apontados em produção. É uma manutenção que precisa ser feita em um segundo momento. |
+| Skills de Domain e Artifact sem refinamento/teste | **Verificar** | Skills são a base para uma implementação de qualidade e padronizada gerada pela IA. O refinamento e teste de skills garantem skills de qualidade para guiar as implementações — devem ser refinadas e testadas antes de serem usadas. Escopo para as 2 semanas: priorizar primeiro as skills de Domain que afetam código de produção (ex.: integração com Azure AI Search), já que impactam diretamente o que vai para o atendente; as skills de Artifact (scaffolding de teste/UI) têm menor risco se ficarem para uma segunda rodada, evitando que o refinamento das 7 skills consuma o prazo todo. |
+| Specs vazios (`pipeline-ingestao`, `query-endpoint`) | **Risco residual** | Devido à falta de dados de negócio para descrever as specs completas, não é viável reescrevê-las do zero em 2 semanas. O risco fica parcialmente mitigado pelo item "mapear os 12% de erros conhecidos por etapa do pipeline" (também priorizado nesta janela), que funciona como uma spec retroativa mínima ao expor o que o código faz hoje versus onde ele erra — reduzindo, ainda que não eliminando, o risco de aceitar código sem contrato de validação formal. |
+| Mapear os 12% de erro conhecidos por etapa do pipeline | **Verificar** | Como já são erros conhecidos, o tratamento não deve demorar muito tempo para ser feito, gerando um bom resultado em pouco tempo de esforço. |
+| 25% de código sem cobertura de teste de integração | **Risco residual** | Falta de cobertura de testes é um problema existente que pode ser tratado em um segundo momento devido ao prazo de 2 semanas. |
+| Reconstrução do changelog do system prompt (git log) | **Verificar** | Alterações no system prompt podem gerar um grande risco ao resultado esperado. O mapeamento das alterações via `git log` pode ser feito de maneira rápida, expondo possíveis falhas ao longo das versões. |
+| Congelamento do processo de mudança de prompt daqui pra frente | **Verificar** | Mudança de prompt somente após a descoberta das alterações até a v6, garantindo um resultado consistente. |
